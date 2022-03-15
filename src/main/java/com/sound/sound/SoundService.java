@@ -25,9 +25,9 @@ public class SoundService {
     private final UserRepository userRepository;
     private final AudioFileRepository audioFileRepository;
 
-    public void uploadAudioFile(MultipartFile audioFile, EmailRequest emailRequest) {
+    public void uploadAudioFile(MultipartFile audioFile, EmailRequest request) {
         User user;
-        String email = emailRequest.getEmail();
+        String email = request.getEmail();
 
         if (userRepository.existsByEmail(email))
             user = userRepository.findByEmail(email);
@@ -36,7 +36,7 @@ public class SoundService {
 
         String fileExtension = audioFile.getName();
         if (!fileExtension.equals("mp3"))
-            throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 확장자입니다.");
+            throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 형식입니다.");
 
         String fileLocation = fileUploadProvider.uploadFile(audioFile);
 
@@ -47,14 +47,17 @@ public class SoundService {
                 .build());
     }
 
-    public void saveSiteSound(SiteSoundRequest soundDto) {
+    public void saveSiteSound(SiteSoundRequest request) {
+
+        if (siteSoundRepository.existsByUrlAndAudioFile_id(request.getUrl(), request.getAudioFileId()))
+            throw new SoundException(409, "한 URL 당 하나의 오디오 파일만 매치할 수 있습니다.");
 
         siteSoundRepository.save(
                 SiteSound.builder()
-                        .url(soundDto.getUrl())
+                        .url(request.getUrl())
                         .audioFile(
-                                audioFileRepository.findById(soundDto.getAudioFileId())
-                                        .orElseThrow(() -> new SoundException(404, "id : " + soundDto.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
+                                audioFileRepository.findById(request.getAudioFileId())
+                                        .orElseThrow(() -> new SoundException(404, "id : " + request.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
                         .build());
     }
 }
