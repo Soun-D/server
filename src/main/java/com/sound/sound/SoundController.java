@@ -1,26 +1,31 @@
 package com.sound.sound;
 
-import com.sound.sound.exception.SoundException;
-import com.sound.sound.mp3.FileUploadProvider;
+import com.sound.sound.dto.EmailRequest;
+import com.sound.sound.dto.SiteSoundRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import javax.validation.Valid;
 
-@RestController("/sound")
+@RestController
+@RequestMapping("/sound")
 @RequiredArgsConstructor
 public class SoundController {
 
-    private final FileUploadProvider fileUploadProvider;
+    private final SoundService soundService;
 
     @PostMapping("/file")
-    public void uploadMp3(@RequestParam(value = "mp3")MultipartFile mp3) {
-        String fileExtension = fileUploadProvider.getFileExtension(Objects.requireNonNull(mp3.getOriginalFilename()));
-        if (!fileExtension.equals("mp3")) throw new SoundException(400, "유효하지 않은 파일 확장자입니다.");
-        fileUploadProvider.uploadFile(mp3);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadAudioFile(@RequestPart(value = "mp3") MultipartFile audioFile,
+                                @Valid @RequestPart(value = "email") EmailRequest emailRequest) {
+        soundService.uploadAudioFile(audioFile, emailRequest);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveSiteSound(@Valid @RequestBody SiteSoundRequest soundRequest) {
+        soundService.saveSiteSound(soundRequest);
     }
 }
