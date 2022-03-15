@@ -26,7 +26,7 @@ public class AudioFile {
     @Column(unique = true)
     private String fileName;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private User user;
 
     @OneToMany(mappedBy = "audioFile")

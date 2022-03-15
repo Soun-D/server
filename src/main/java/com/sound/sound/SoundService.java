@@ -1,7 +1,9 @@
 package com.sound.sound;
 
-import com.sound.sound.dto.EmailRequest;
-import com.sound.sound.dto.SiteSoundRequest;
+import com.sound.sound.dto.request.EmailRequest;
+import com.sound.sound.dto.request.SiteSoundRequest;
+import com.sound.sound.dto.response.AudioFileResponse;
+import com.sound.sound.dto.response.SiteSoundResponse;
 import com.sound.sound.entity.AudioFile;
 import com.sound.sound.entity.SiteSound;
 import com.sound.sound.entity.User;
@@ -13,6 +15,9 @@ import com.sound.sound.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.*;
 
@@ -50,14 +55,38 @@ public class SoundService {
     public void saveSiteSound(SiteSoundRequest request) {
 
         if (siteSoundRepository.existsByUrlAndAudioFile_id(request.getUrl(), request.getAudioFileId()))
-            throw new SoundException(409, "한 URL 당 하나의 오디오 파일만 매치할 수 있습니다.");
+            throw new SoundException(409, "이미 이 URL { " + request.getUrl() + " }에 매치된 오디오 파일이 존재합니다.");
 
         siteSoundRepository.save(
                 SiteSound.builder()
                         .url(request.getUrl())
                         .audioFile(
                                 audioFileRepository.findById(request.getAudioFileId())
-                                        .orElseThrow(() -> new SoundException(404, "id : " + request.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
+                                        .orElseThrow(() -> new SoundException(404, "id : "
+                                                + request.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
                         .build());
+    }
+
+    public List<AudioFileResponse> queryAudioFile(String email) {
+        return audioFileRepository.findAllByUserEmail(email)
+                .stream().map(AudioFileResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<SiteSoundResponse> querySiteSound(Integer audioFileId) {
+        return siteSoundRepository.findAllByAudioFile_id(audioFileId).stream()
+                .map(SiteSoundResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteAudioFile(Integer audioFileId, String email) {
+        fileUploadProvider.deleteFile(audioFileRepository.findById(audioFileId)
+                .orElseThrow(() -> new SoundException(404, audioFileId + " Audio not found."))
+                .getFileLocation());
+        audioFileRepository.deleteByIdAndUserEmail(audioFileId, email);
+    }
+
+    public void deleteSiteSound(Integer siteSoundId, Integer audioFileId) {
+        siteSoundRepository.deleteByIdAndAudioFile_id(siteSoundId, audioFileId);
     }
 }
