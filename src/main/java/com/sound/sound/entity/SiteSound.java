@@ -17,6 +17,6 @@ public class SiteSound {
     @NotNull
     private String url;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private AudioFile audioFile;
 }
