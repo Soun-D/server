@@ -1,12 +1,17 @@
 spring:
-  h2:
-    console:
-      enabled: true
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL55Dialect
+    database: mysql
+    hibernate:
+      ddl-auto: none
+
 cloud:
   aws:
     s3:

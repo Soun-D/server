@@ -54,17 +54,25 @@ public class SoundService {
 
     public void saveSiteSound(SiteSoundRequest request) {
 
-        if (siteSoundRepository.existsByUrlAndAudioFile_id(request.getUrl(), request.getAudioFileId()))
-            throw new SoundException(409, "이미 이 URL { " + request.getUrl() + " }에 매치된 오디오 파일이 존재합니다.");
+        String[] urls = request.getUrl()
+                .replaceAll("\\s", "")
+                .split(",");
 
-        siteSoundRepository.save(
-                SiteSound.builder()
-                        .url(request.getUrl())
-                        .audioFile(
-                                audioFileRepository.findById(request.getAudioFileId())
-                                        .orElseThrow(() -> new SoundException(404, "id : "
-                                                + request.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
-                        .build());
+        for (String url : urls) {
+            if (siteSoundRepository.existsByUrlAndAudioFile_id(url, request.getAudioFileId()))
+                throw new SoundException(409, "이미 이 URL { " + request.getUrl() + " }에 매치된 오디오 파일이 존재합니다.");
+
+            siteSoundRepository.save(
+                    SiteSound.builder()
+                            .url(url)
+                            .audioFile(
+                                    audioFileRepository.findById(request.getAudioFileId())
+                                            .orElseThrow(() -> new SoundException(404, "id : "
+                                                    + request.getAudioFileId() + " audio 파일을 찾을 수 없습니다.")))
+                            .build());
+        }
+
+
     }
 
     public List<AudioFileResponse> queryAudioFile(String email) {
@@ -81,7 +89,7 @@ public class SoundService {
 
     public void deleteAudioFile(Integer audioFileId, String email) {
         fileUploadProvider.deleteFile(audioFileRepository.findById(audioFileId)
-                .orElseThrow(() -> new SoundException(404, audioFileId + " Audio not found."))
+                .orElseThrow(() -> new SoundException(404, "id : " + audioFileId + " Audio not found."))
                 .getFileLocation());
         audioFileRepository.deleteByIdAndUserEmail(audioFileId, email);
     }

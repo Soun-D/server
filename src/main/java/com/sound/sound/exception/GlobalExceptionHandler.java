@@ -3,13 +3,14 @@ package com.sound.sound.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class, MissingServletRequestParameterException.class})
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(final Exception e) {
         final ErrorResponse response = new ErrorResponse(400, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getErrorCode()));
