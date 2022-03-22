@@ -1,0 +1,19 @@
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_BUCKET}
+    region:
+      static: ${AWS_REGION}
+    stack:
+      auto: false
+    credentials:
+      instanceProfile: true
+      accessKey: ${AWS_ACCESS}
+      secretKey: ${AWS_SECRET}
