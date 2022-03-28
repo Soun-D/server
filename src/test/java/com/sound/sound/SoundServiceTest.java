@@ -43,7 +43,7 @@ class SoundServiceTest {
     @Test
     void saveSiteSound_2urls() {
         //given
-        audioFileRepository.save(AudioFile.builder()
+        AudioFile audioFile = audioFileRepository.save(AudioFile.builder()
                 .fileLocation("fileLocation")
                 .fileName("fileName")
                 .user(user)
@@ -52,7 +52,7 @@ class SoundServiceTest {
         SiteSoundRequest siteSoundRequest = new SiteSoundRequest(
                 "https://naver.com, \n" +
                         "https://google.com",
-                1
+                audioFile.getId()
         );
 
         //when

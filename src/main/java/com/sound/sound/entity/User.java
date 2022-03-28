@@ -26,4 +26,8 @@ public class User {
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
     private List<AudioFile> audioFile;
+
+    public User(String email) {
+        this.email = email;
+    }
 }
