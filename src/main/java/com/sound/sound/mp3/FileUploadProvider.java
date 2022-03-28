@@ -17,13 +17,13 @@ public class FileUploadProvider {
 
     private final AwsS3UploadService s3UploadService;
 
-    public String uploadFile(MultipartFile file) {
+    public String uploadFileToS3(MultipartFile file) {
         String fileName = createFileName(file.getOriginalFilename());
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());
         objectMetadata.setContentType(file.getContentType());
 
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
             inputStream = file.getInputStream();
         } catch (IOException e) {
