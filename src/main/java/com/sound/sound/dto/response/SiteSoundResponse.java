@@ -9,14 +9,17 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SiteSoundResponse {
-    private Integer id;
+    private final Integer id;
 
-    private String url;
+    private final String url;
+
+    private final String fileLocation;
 
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
                 .url(siteSound.getUrl())
+                .fileLocation(siteSound.getAudioFile().getFileLocation())
                 .build();
     }
 }

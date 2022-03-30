@@ -10,11 +10,11 @@ import lombok.Getter;
 @Builder
 public class AudioFileResponse {
 
-    private Integer id;
+    private final Integer id;
 
-    private String fileLocation;
+    private final String fileLocation;
 
-    private String fileName;
+    private final String fileName;
 
     public static AudioFileResponse of(AudioFile audioFile) {
         return AudioFileResponse.builder()
