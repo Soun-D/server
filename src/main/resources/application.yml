@@ -11,6 +11,8 @@ spring:
     database: mysql
     hibernate:
       ddl-auto: none
+  main:
+    allow-circular-references: true
 
 cloud:
   aws:
