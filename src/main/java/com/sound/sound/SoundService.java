@@ -80,8 +80,8 @@ public class SoundService {
                 .collect(Collectors.toList());
     }
 
-    public List<SiteSoundResponse> querySiteSound(Integer audioFileId) {
-        return siteSoundRepository.findAllByAudioFile_id(audioFileId).stream()
+    public List<SiteSoundResponse> querySiteSound(String email) {
+        return siteSoundRepository.findAllByAudioFileUserEmail(email).stream()
                 .map(SiteSoundResponse::of)
                 .collect(Collectors.toList());
     }

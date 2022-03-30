@@ -39,8 +39,8 @@ public class SoundController {
 
     @GetMapping("/site-sound")
     @ResponseStatus(HttpStatus.OK)
-    public List<SiteSoundResponse> readSiteSound(@RequestParam(value = "audioFileId") Integer audioFileId) {
-        return soundService.querySiteSound(audioFileId);
+    public List<SiteSoundResponse> readSiteSound(@RequestParam(value = "email") String email) {
+        return soundService.querySiteSound(email);
     }
 
     @DeleteMapping("/audio-file")
