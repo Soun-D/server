@@ -15,11 +15,14 @@ public class SiteSoundResponse {
 
     private final String fileLocation;
 
+    private final String fileName;
+
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
                 .url(siteSound.getUrl())
                 .fileLocation(siteSound.getAudioFile().getFileLocation())
+                .fileName(siteSound.getAudioFile().getFileName())
                 .build();
     }
 }
