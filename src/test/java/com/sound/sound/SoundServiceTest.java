@@ -5,6 +5,7 @@ import com.sound.sound.entity.AudioFile;
 import com.sound.sound.entity.User;
 import com.sound.sound.repository.AudioFileRepository;
 import com.sound.sound.repository.SiteSoundRepository;
+import com.sound.sound.repository.UrlRepository;
 import com.sound.sound.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +26,15 @@ class SoundServiceTest {
     AudioFileRepository audioFileRepository;
     @Autowired
     SiteSoundRepository siteSoundRepository;
+    @Autowired
+    UrlRepository urlRepository;
 
     User user;
 
     @BeforeEach
     void setUp() {
         user = userRepository.save(User.builder()
-                .email("test@gmail.com")
+                .email("kwakdh25@gmail.com")
                 .build());
     }
 
@@ -59,6 +62,7 @@ class SoundServiceTest {
         soundService.saveSiteSound(siteSoundRequest);
 
         //then
-        assertEquals(2, siteSoundRepository.findAll().size());
+        assertEquals(1, siteSoundRepository.findAll().size());
+        assertEquals(2, urlRepository.findAll().size());
     }
 }

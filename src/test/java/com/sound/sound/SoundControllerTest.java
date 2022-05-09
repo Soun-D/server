@@ -1,13 +1,14 @@
 package com.sound.sound;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sound.sound.dto.request.SiteSoundDeleteRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
-import com.sound.sound.entity.AudioFile;
-import com.sound.sound.entity.SiteSound;
-import com.sound.sound.entity.User;
+import com.sound.sound.dto.request.SiteSoundUpdateRequest;
+import com.sound.sound.entity.*;
 import com.sound.sound.mp3.FileUploadProvider;
 import com.sound.sound.repository.AudioFileRepository;
 import com.sound.sound.repository.SiteSoundRepository;
+import com.sound.sound.repository.UrlRepository;
 import com.sound.sound.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,8 @@ public class SoundControllerTest {
     UserRepository userRepository;
     @Autowired
     SiteSoundRepository siteSoundRepository;
+    @Autowired
+    UrlRepository urlRepository;
 
     @MockBean
     private FileUploadProvider fileUploadProvider;
@@ -66,7 +69,11 @@ public class SoundControllerTest {
                 .build());
         siteSound = siteSoundRepository.save(SiteSound.builder()
                 .audioFile(audioFile)
-                .url("url")
+                .url("https://test.com")
+                .build());
+        urlRepository.save(Url.builder()
+                .user(user)
+                .urlId(new UrlId("https://test.com", user.getId()))
                 .build());
     }
 
@@ -76,7 +83,7 @@ public class SoundControllerTest {
     }
 
     @Test
-    void createAudioFile() throws Exception {
+    void AudioFile_저장_201() throws Exception {
 
         // given
         MockMultipartFile mp3File = new MockMultipartFile("mp3",
@@ -89,7 +96,7 @@ public class SoundControllerTest {
                 "application/json",
                 "{\"email\": \"kwakdh25@gmail.com\"}".getBytes());
 
-        given(fileUploadProvider.uploadFileToS3(any(MultipartFile.class))).willReturn("url");
+        given(fileUploadProvider.uploadFileToS3(any(MultipartFile.class))).willReturn("https://test.com");
 
         // when
         mvc.perform(multipart("/audio-file")
@@ -103,19 +110,62 @@ public class SoundControllerTest {
         List<AudioFile> audioFileList = audioFileRepository.findAllByUserEmail("kwakdh25@gmail.com");
 
         audioFileList.forEach(audioFile1 ->
-                assertEquals("url", audioFile1.getFileLocation())
+                assertEquals("https://test.com", audioFile1.getFileLocation())
         );
     }
 
     @Test
-    void createSiteSound() throws Exception {
+    void SiteSound_저장_201() throws Exception {
         // given
         mvc.perform(post("/site-sound")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new SiteSoundRequest("https://naver.com", audioFile.getId()))))
+                .content(objectMapper.writeValueAsString(new SiteSoundRequest("https://google.com,   http://knowing.com", audioFile.getId()))))
 
         // then
                 .andExpect(status().isCreated());
+
+        assertEquals(3, urlRepository.findAll().size());
+        assertEquals(2, siteSoundRepository.findAll().size());
+    }
+
+    @Test
+    void SiteSound_저장_400_유효한_URL_형식이_아닙니다() throws Exception {
+        // given
+        mvc.perform(post("/site-sound")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SiteSoundRequest("https://naver.com, " +
+                        "https://google.com,   http://.com", audioFile.getId()))))
+
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void SiteSound_저장_409_URL_중복() throws Exception {
+        // given
+        mvc.perform(post("/site-sound")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SiteSoundRequest("https://naver.com, " +
+                        "https://naver.com, https://test.com", audioFile.getId()))))
+
+                // then
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void SiteSound_수정_201() throws Exception {
+        // given
+        String url = "https://naver.com, " +
+                "https://facebook.com, https://test.com";
+        mvc.perform(put("/site-sound")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SiteSoundUpdateRequest(siteSound.getId(), url, audioFile.getId()))))
+
+                // then
+                .andExpect(status().isCreated());
+
+        assertEquals(3, urlRepository.findAllByUser(user).size());
+        assertEquals(siteSoundRepository.findById(siteSound.getId()).orElseThrow().getUrl(), url);
 
     }
 
@@ -134,11 +184,11 @@ public class SoundControllerTest {
     void readSiteSound() throws Exception {
         // given
         mvc.perform(get("/site-sound")
-                .param("audioFileId", audioFile.getId().toString()))
+                .param("email", user.getEmail()))
 
                 // then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].url").value("url"));
+                .andExpect(jsonPath("$[0].url").value("https://test.com"));
     }
 
     @Test
@@ -156,8 +206,8 @@ public class SoundControllerTest {
     void deleteSiteSound() throws Exception {
         // given
         mvc.perform(delete("/site-sound")
-                .param("audioFileId", audioFile.getId().toString())
-                .param("siteSoundId", siteSound.getId().toString()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SiteSoundDeleteRequest(siteSound.getId()))))
 
                 // then
                 .andExpect(status().isNoContent());
