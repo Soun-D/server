@@ -1,6 +1,7 @@
 package com.sound.sound;
 
 import com.sound.sound.dto.request.EmailRequest;
+import com.sound.sound.dto.request.SiteSoundDeleteRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
@@ -52,8 +53,7 @@ public class SoundController {
 
     @DeleteMapping("/site-sound")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSiteSound(@RequestParam(value = "siteSoundId") Integer siteSoundId,
-                                @RequestParam(value = "audioFileId") Integer audioFileId) {
-        soundService.deleteSiteSound(siteSoundId, audioFileId);
+    public void deleteSiteSound(@RequestBody SiteSoundDeleteRequest siteSound) {
+        soundService.deleteSiteSound(siteSound.getSiteSoundId());
     }
 }

@@ -94,8 +94,8 @@ public class SoundService {
     }
 
     @Transactional
-    public void deleteSiteSound(Integer siteSoundId, Integer audioFileId) {
-        siteSoundRepository.deleteByIdAndAudioFile_id(siteSoundId, audioFileId);
+    public void deleteSiteSound(Integer siteSoundId) {
+        siteSoundRepository.deleteById(siteSoundId);
     }
 
 
