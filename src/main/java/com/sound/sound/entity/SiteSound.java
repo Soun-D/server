@@ -19,4 +19,10 @@ public class SiteSound {
 
     @ManyToOne
     private AudioFile audioFile;
+
+    public SiteSound update(String url, AudioFile audioFile) {
+        this.url = url;
+        this.audioFile = audioFile;
+        return this;
+    }
 }
