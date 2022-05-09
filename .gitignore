@@ -4,6 +4,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+*.log
 
 ### STS ###
 .apt_generated
@@ -19,6 +20,7 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+.jpb
 *.iws
 *.iml
 *.ipr
@@ -36,6 +38,3 @@ out/
 ### VS Code ###
 .vscode/
 
-.jpb
-
-*.log
