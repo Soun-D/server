@@ -2,15 +2,15 @@ package com.sound.sound;
 
 import com.sound.sound.dto.request.EmailRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
+import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
-import com.sound.sound.entity.AudioFile;
-import com.sound.sound.entity.SiteSound;
-import com.sound.sound.entity.User;
+import com.sound.sound.entity.*;
 import com.sound.sound.exception.SoundException;
 import com.sound.sound.mp3.FileUploadProvider;
 import com.sound.sound.repository.AudioFileRepository;
 import com.sound.sound.repository.SiteSoundRepository;
+import com.sound.sound.repository.UrlRepository;
 import com.sound.sound.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.*;
@@ -30,19 +32,16 @@ public class SoundService {
     private final FileUploadProvider fileUploadProvider;
     private final UserRepository userRepository;
     private final AudioFileRepository audioFileRepository;
+    private final UrlRepository urlRepository;
 
     @Transactional
     public void uploadAudioFile(MultipartFile audioFile, EmailRequest request) {
-        User user;
-        String email = request.getEmail();
 
-        if (userRepository.existsByEmail(email))
-            user = userRepository.findByEmail(email);
-        else
-            user = saveUser(email);
+        String email = request.getEmail();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = optionalUser.orElseGet(() -> saveUser(email));
 
         String fileExtension = audioFile.getName();
-
         isFileExtensionMp3(fileExtension);
 
         String fileLocation = fileUploadProvider.uploadFileToS3(audioFile);
@@ -60,18 +59,53 @@ public class SoundService {
 
     @Transactional
     public void saveSiteSound(SiteSoundRequest request) {
-        String[] urls = request.getUrl()
+        String[] requestedUrls = request.getUrl()
                 .replaceAll("\\s", "")
                 .split(",");
 
-        for (String url : urls) {
-            checkUrlDuplicate(url, request.getAudioFileId());
+        AudioFile audioFile = getAudioFileById(request.getAudioFileId());
 
-            siteSoundRepository.save(SiteSound.builder()
-                            .url(url)
-                            .audioFile(getAudioFileById(request.getAudioFileId()))
-                            .build());
-        }
+        User user = audioFile.getUser();
+
+        List<String> existUrlList = urlRepository.findAllByUser(user).stream()
+                .map(url -> url.getUrlId().getUrl()).collect(Collectors.toList());
+
+        saveEachUrl(requestedUrls, existUrlList, user);
+
+        siteSoundRepository.save(SiteSound.builder()
+                .url(request.getUrl())
+                .audioFile(audioFile)
+                .build());
+    }
+
+    @Transactional
+    public void updateSiteSound(SiteSoundUpdateRequest request) {
+        SiteSound siteSound = siteSoundRepository.findById(request.getId())
+                .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
+
+        String[] existsUrls = siteSound.getUrl()
+                .replaceAll("\\s", "")
+                .split(",");
+
+        for (String url : existsUrls)
+            urlRepository.deleteById(new UrlId(url, siteSound.getAudioFile().getUser().getId()));
+
+        User user = siteSound.getAudioFile().getUser();
+
+        String[] newUrls = request.getUrl()
+                .replaceAll("\\s", "")
+                .split(",");
+
+        List<String> existUrlList = urlRepository.findAllByUser(user)
+                .stream().map(url -> url.getUrlId().getUrl())
+                .collect(Collectors.toList());
+
+        saveEachUrl(newUrls, existUrlList, user);
+
+        AudioFile audioFile = audioFileRepository.findById(request.getAudioFileId())
+                .orElseThrow(() -> new SoundException(404, "Audio File Not Found."));
+
+        siteSound.update(request.getUrl(), audioFile);
     }
 
     public List<AudioFileResponse> queryAudioFile(String email) {
@@ -88,13 +122,22 @@ public class SoundService {
 
     @Transactional
     public void deleteAudioFile(Integer audioFileId, String email) {
-        fileUploadProvider.deleteFile(
-                getAudioFileById(audioFileId).getFileLocation());
+        fileUploadProvider.deleteFile(getAudioFileById(audioFileId).getFileLocation());
         audioFileRepository.deleteByIdAndUserEmail(audioFileId, email);
     }
 
     @Transactional
     public void deleteSiteSound(Integer siteSoundId) {
+        SiteSound siteSound = siteSoundRepository.findById(siteSoundId)
+                .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
+
+        String[] existsUrls = siteSound.getUrl()
+                .replaceAll("\\s", "")
+                .split(",");
+
+        for (String url : existsUrls)
+            urlRepository.deleteById(new UrlId(url, siteSound.getAudioFile().getUser().getId()));
+
         siteSoundRepository.deleteById(siteSoundId);
     }
 
@@ -114,8 +157,20 @@ public class SoundService {
                         + audioFileId + " audio 파일을 찾을 수 없습니다."));
     }
 
-    private void checkUrlDuplicate(String url, Integer audioFileId) {
-        if (siteSoundRepository.existsByUrlAndAudioFile_id(url, audioFileId))
-            throw new SoundException(409, "이미 이 URL { " + audioFileId + " }에 매치된 오디오 파일이 존재합니다.");
+    private void saveEachUrl(String[] urls, List<String> existUrlList, User user) {
+        for (String url : urls) {
+
+            if (!Pattern.matches("^((http(s?))://)([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]{2,6}(:[0-9]+)?(/\\S*)?$", url) )
+                throw new SoundException(400, "URL is not valid.");
+
+            if (existUrlList.contains(url))
+                throw new SoundException(409, "이미 이 URL { " + url + " }에 매치되어있는 소리가 존재합니다.");
+
+            urlRepository.save(Url.builder()
+                    .urlId(new UrlId(url, user.getId()))
+                    .user(user)
+                    .build());
+        }
     }
+
 }

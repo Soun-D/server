@@ -3,6 +3,7 @@ package com.sound.sound;
 import com.sound.sound.dto.request.EmailRequest;
 import com.sound.sound.dto.request.SiteSoundDeleteRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
+import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class SoundController {
         soundService.saveSiteSound(soundRequest);
     }
 
+    @PutMapping("/site-sound")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void updateSiteSound(@Valid @RequestBody SiteSoundUpdateRequest soundRequest) {
+        soundService.updateSiteSound(soundRequest);
+    }
     @GetMapping("/audio-file")
     @ResponseStatus(HttpStatus.OK)
     public List<AudioFileResponse> readAudioFile(@RequestParam(value = "email") String email) {
