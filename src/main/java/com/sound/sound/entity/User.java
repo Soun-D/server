@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+@Table(name = "user")
 @Entity
 @Getter
 @NoArgsConstructor
@@ -25,7 +26,10 @@ public class User {
     private String email;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
-    private List<AudioFile> audioFile;
+    private List<AudioFile> audioFileList;
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
+    private List<Url> UrlList;
 
     public User(String email) {
         this.email = email;
