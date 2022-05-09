@@ -3,8 +3,8 @@ package com.sound.sound.repository;
 import com.sound.sound.entity.User;
 import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository extends CrudRepository<User, Integer> {
-    User findByEmail(String email);
+import java.util.Optional;
 
-    boolean existsByEmail(String email);
+public interface UserRepository extends CrudRepository<User, Integer> {
+    Optional<User> findByEmail(String email);
 }
