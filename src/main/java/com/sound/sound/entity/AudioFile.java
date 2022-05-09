@@ -19,14 +19,15 @@ public class AudioFile {
     private Integer id;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String fileLocation;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String fileName;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "audioFile")
