@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface AudioFileRepository extends CrudRepository<AudioFile, Integer> {
-    List<AudioFile> findAllByUserEmail(String email);
+    List<AudioFile> findAllByUserEmailOrderById(String email);
 
     void deleteByIdAndUserEmail(Integer id, String email);
 }

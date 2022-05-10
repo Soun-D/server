@@ -109,13 +109,13 @@ public class SoundService {
     }
 
     public List<AudioFileResponse> queryAudioFile(String email) {
-        return audioFileRepository.findAllByUserEmail(email)
+        return audioFileRepository.findAllByUserEmailOrderById(email)
                 .stream().map(AudioFileResponse::of)
                 .collect(Collectors.toList());
     }
 
     public List<SiteSoundResponse> querySiteSound(String email) {
-        return siteSoundRepository.findAllByAudioFileUserEmail(email).stream()
+        return siteSoundRepository.findAllByAudioFileUserEmailOrderById(email).stream()
                 .map(SiteSoundResponse::of)
                 .collect(Collectors.toList());
     }

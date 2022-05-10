@@ -107,7 +107,7 @@ public class SoundControllerTest {
         // then
         .andExpect(status().isCreated());
 
-        List<AudioFile> audioFileList = audioFileRepository.findAllByUserEmail("kwakdh25@gmail.com");
+        List<AudioFile> audioFileList = audioFileRepository.findAllByUserEmailOrderById("kwakdh25@gmail.com");
 
         audioFileList.forEach(audioFile1 ->
                 assertEquals("https://test.com", audioFile1.getFileLocation())

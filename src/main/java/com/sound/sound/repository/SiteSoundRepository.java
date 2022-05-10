@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SiteSoundRepository extends JpaRepository<SiteSound, Integer> {
 
-    List<SiteSound> findAllByAudioFileUserEmail(String email);
+    List<SiteSound> findAllByAudioFileUserEmailOrderById(String email);
 }
