@@ -1,7 +1,7 @@
 package com.sound.sound;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sound.sound.dto.request.SiteSoundDeleteRequest;
+import com.sound.sound.dto.request.IdReq;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.entity.*;
@@ -207,7 +207,7 @@ public class SoundControllerTest {
         // given
         mvc.perform(delete("/site-sound")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new SiteSoundDeleteRequest(siteSound.getId()))))
+                .content(objectMapper.writeValueAsString(new IdReq(siteSound.getId()))))
 
                 // then
                 .andExpect(status().isNoContent());

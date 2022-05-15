@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -80,15 +81,17 @@ public class SoundService {
 
     @Transactional
     public void updateSiteSound(SiteSoundUpdateRequest request) {
-        SiteSound siteSound = siteSoundRepository.findById(request.getId())
-                .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
+        SiteSound siteSound = getSiteSoundById(request.getId());
 
         String[] existsUrls = siteSound.getUrl()
                 .replaceAll("\\s", "")
                 .split(",");
 
         for (String url : existsUrls)
-            urlRepository.deleteById(new UrlId(url, siteSound.getAudioFile().getUser().getId()));
+            urlRepository.deleteById(new UrlId(
+                    url,
+                    siteSound.getAudioFile().getUser().getId()
+            ));
 
         User user = siteSound.getAudioFile().getUser();
 
@@ -102,15 +105,14 @@ public class SoundService {
 
         saveEachUrl(newUrls, existUrlList, user);
 
-        AudioFile audioFile = audioFileRepository.findById(request.getAudioFileId())
-                .orElseThrow(() -> new SoundException(404, "Audio File Not Found."));
+        AudioFile audioFile = getAudioFileById(request.getAudioFileId());
 
-        siteSound.update(request.getUrl(), audioFile);
+        siteSoundRepository.save(siteSound.update(request.getUrl(), audioFile));
     }
 
     public List<AudioFileResponse> queryAudioFile(String email) {
-        return audioFileRepository.findAllByUserEmailOrderById(email)
-                .stream().map(AudioFileResponse::of)
+        return audioFileRepository.findAllByUserEmailOrderById(email).stream()
+                .map(AudioFileResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -118,6 +120,24 @@ public class SoundService {
         return siteSoundRepository.findAllByAudioFileUserEmailOrderById(email).stream()
                 .map(SiteSoundResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    public List<SiteSoundResponse> querySplitSiteSound(String email) {
+        List<SiteSoundResponse> responseList = new ArrayList<>();
+        List<SiteSound> siteSoundList = siteSoundRepository.findAllByAudioFileUserEmailOrderById(email);
+        siteSoundList
+                .forEach(
+                siteSound -> {
+                    String[] existsUrls = siteSound.getUrl()
+                            .replaceAll("\\s", "")
+                            .split(",");
+
+                    if (existsUrls.length > 0)
+                        for (String url : existsUrls)
+                            responseList.add(SiteSoundResponse.oneUrl(url, siteSound));
+                });
+
+        return responseList;
     }
 
     @Transactional
@@ -128,15 +148,16 @@ public class SoundService {
 
     @Transactional
     public void deleteSiteSound(Integer siteSoundId) {
-        SiteSound siteSound = siteSoundRepository.findById(siteSoundId)
-                .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
+        SiteSound siteSound = getSiteSoundById(siteSoundId);
 
         String[] existsUrls = siteSound.getUrl()
                 .replaceAll("\\s", "")
                 .split(",");
 
         for (String url : existsUrls)
-            urlRepository.deleteById(new UrlId(url, siteSound.getAudioFile().getUser().getId()));
+            urlRepository.deleteById(new UrlId(
+                    url,
+                    siteSound.getAudioFile().getUser().getId()));
 
         siteSoundRepository.deleteById(siteSoundId);
     }
@@ -155,6 +176,11 @@ public class SoundService {
         return audioFileRepository.findById(audioFileId)
                 .orElseThrow(() -> new SoundException(404, "id : "
                         + audioFileId + " audio 파일을 찾을 수 없습니다."));
+    }
+
+    private SiteSound getSiteSoundById(Integer siteSoundId) {
+        return siteSoundRepository.findById(siteSoundId)
+                .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
     }
 
     private void saveEachUrl(String[] urls, List<String> existUrlList, User user) {

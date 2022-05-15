@@ -30,6 +30,6 @@ public class AudioFile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "audioFile")
+    @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
 }

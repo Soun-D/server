@@ -1,7 +1,7 @@
 package com.sound.sound;
 
 import com.sound.sound.dto.request.EmailRequest;
-import com.sound.sound.dto.request.SiteSoundDeleteRequest;
+import com.sound.sound.dto.request.IdReq;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
@@ -38,6 +38,7 @@ public class SoundController {
     public void updateSiteSound(@Valid @RequestBody SiteSoundUpdateRequest soundRequest) {
         soundService.updateSiteSound(soundRequest);
     }
+
     @GetMapping("/audio-file")
     @ResponseStatus(HttpStatus.OK)
     public List<AudioFileResponse> readAudioFile(@RequestParam(value = "email") String email) {
@@ -50,16 +51,22 @@ public class SoundController {
         return soundService.querySiteSound(email);
     }
 
+    @GetMapping("/site-sound/split")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SiteSoundResponse> readSplitSiteSound(@RequestParam(value = "email") String email) {
+        return soundService.querySplitSiteSound(email);
+    }
+
     @DeleteMapping("/audio-file")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAudioFile(@RequestParam(value = "audioFileId") Integer audioFileId,
+    public void deleteAudioFile(@RequestBody IdReq audioFileId,
                                 @RequestParam(value = "email") String email) {
-        soundService.deleteAudioFile(audioFileId, email);
+        soundService.deleteAudioFile(audioFileId.getId(), email);
     }
 
     @DeleteMapping("/site-sound")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSiteSound(@RequestBody SiteSoundDeleteRequest siteSound) {
-        soundService.deleteSiteSound(siteSound.getSiteSoundId());
+    public void deleteSiteSound(@RequestBody IdReq siteSoundId) {
+        soundService.deleteSiteSound(siteSoundId.getId());
     }
 }

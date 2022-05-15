@@ -17,8 +17,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .cors().disable()
             .authorizeRequests()
-                .antMatchers("/audio-file", "/site-sound").permitAll()
+                .antMatchers("/audio-file", "/site-sound","/site-sound/*").permitAll()
             .anyRequest().authenticated();
     }
 

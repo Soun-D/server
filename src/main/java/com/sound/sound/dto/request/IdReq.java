@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SiteSoundDeleteRequest {
-    Integer siteSoundId;
+public class IdReq {
+    Integer id;
 }

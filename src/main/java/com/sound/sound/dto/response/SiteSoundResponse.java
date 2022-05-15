@@ -17,12 +17,22 @@ public class SiteSoundResponse {
 
     private final String fileName;
 
+    private final Integer fileId;
+
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
                 .url(siteSound.getUrl())
                 .fileLocation(siteSound.getAudioFile().getFileLocation())
                 .fileName(siteSound.getAudioFile().getFileName())
+                .fileId(siteSound.getAudioFile().getId())
+                .build();
+    }
+
+    public static SiteSoundResponse oneUrl(String url, SiteSound siteSound) {
+        return SiteSoundResponse.builder()
+                .url(url)
+                .fileLocation(siteSound.getAudioFile().getFileLocation())
                 .build();
     }
 }
