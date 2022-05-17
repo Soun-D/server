@@ -42,18 +42,23 @@ public class SoundService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.orElseGet(() -> saveUser(email));
 
+        String fileName = requireNonNull(
+                audioFile.getOriginalFilename()
+        ).split("\\.")[0];
+
+        if (audioFileRepository.existsByFileNameAndUser(fileName, user))
+            throw new SoundException(409, "동일한 이름의 파일이 이미 존재합니다.");
+
         String fileExtension = audioFile.getName();
-        isFileExtensionMp3(fileExtension);
+
+        if (!fileExtension.equals("mp3") && !fileExtension.equals("m4a"))
+            throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 형식입니다.");
 
         String fileLocation = fileUploadProvider.uploadFileToS3(audioFile);
 
         audioFileRepository.save(AudioFile.builder()
                 .fileLocation(fileLocation)
-                .fileName(
-                        requireNonNull(
-                                audioFile.getOriginalFilename()
-                        ).split("\\.")[0]
-                )
+                .fileName(fileName)
                 .user(user)
                 .build());
     }
@@ -156,11 +161,6 @@ public class SoundService {
         siteSoundRepository.deleteById(siteSoundId);
     }
 
-
-    private void isFileExtensionMp3(String fileExtension) {
-        if (!fileExtension.equals("mp3") && !fileExtension.equals("m4a"))
-            throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 형식입니다.");
-    }
 
     private User saveUser(String email) {
         return userRepository.save(new User(email));
