@@ -14,10 +14,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 public class Url {
-    @EmbeddedId
-    private UrlId urlId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @MapsId("userId")
+    @Column(length = 2000)
+    private String url;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

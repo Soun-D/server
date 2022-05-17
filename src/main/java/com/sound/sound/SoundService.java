@@ -68,10 +68,7 @@ public class SoundService {
 
         User user = audioFile.getUser();
 
-        List<String> existUrlList = urlRepository.findAllByUser(user).stream()
-                .map(url -> url.getUrlId().getUrl()).collect(Collectors.toList());
-
-        saveEachUrl(requestedUrls, existUrlList, user);
+        saveEachUrl(requestedUrls, user);
 
         siteSoundRepository.save(SiteSound.builder()
                 .url(request.getUrl())
@@ -88,10 +85,7 @@ public class SoundService {
                 .split(",");
 
         for (String url : existsUrls)
-            urlRepository.deleteById(new UrlId(
-                    url,
-                    siteSound.getAudioFile().getUser().getId()
-            ));
+            urlRepository.deleteByUrlAndUser(url, siteSound.getAudioFile().getUser());
 
         User user = siteSound.getAudioFile().getUser();
 
@@ -99,11 +93,7 @@ public class SoundService {
                 .replaceAll("\\s", "")
                 .split(",");
 
-        List<String> existUrlList = urlRepository.findAllByUser(user)
-                .stream().map(url -> url.getUrlId().getUrl())
-                .collect(Collectors.toList());
-
-        saveEachUrl(newUrls, existUrlList, user);
+        saveEachUrl(newUrls, user);
 
         AudioFile audioFile = getAudioFileById(request.getAudioFileId());
 
@@ -142,8 +132,14 @@ public class SoundService {
 
     @Transactional
     public void deleteAudioFile(Integer audioFileId, String email) {
-        fileUploadProvider.deleteFile(getAudioFileById(audioFileId).getFileLocation());
+        if (siteSoundRepository.existsByAudioFileId(audioFileId))
+            throw new SoundException(400, "연결된 URL이 존재하므로 삭제할 수 없습니다.");
+
+        AudioFile audioFile = getAudioFileById(audioFileId);
+
         audioFileRepository.deleteByIdAndUserEmail(audioFileId, email);
+
+        fileUploadProvider.deleteFile(audioFile.getFileLocation());
     }
 
     @Transactional
@@ -155,16 +151,14 @@ public class SoundService {
                 .split(",");
 
         for (String url : existsUrls)
-            urlRepository.deleteById(new UrlId(
-                    url,
-                    siteSound.getAudioFile().getUser().getId()));
+            urlRepository.deleteByUrlAndUser(url, siteSound.getAudioFile().getUser());
 
         siteSoundRepository.deleteById(siteSoundId);
     }
 
 
     private void isFileExtensionMp3(String fileExtension) {
-        if (!fileExtension.equals("mp3"))
+        if (!fileExtension.equals("mp3") && !fileExtension.equals("m4a"))
             throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 형식입니다.");
     }
 
@@ -183,17 +177,17 @@ public class SoundService {
                 .orElseThrow(() -> new SoundException(404, "Site Sound Not Found."));
     }
 
-    private void saveEachUrl(String[] urls, List<String> existUrlList, User user) {
+    private void saveEachUrl(String[] urls, User user) {
         for (String url : urls) {
 
             if (!Pattern.matches("^((http(s?))://)([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]{2,6}(:[0-9]+)?(/\\S*)?$", url) )
-                throw new SoundException(400, "URL is not valid.");
+                throw new SoundException(400, "URL이 형식에 맞지 않습니다.");
 
-            if (existUrlList.contains(url))
+            if (urlRepository.existsByUrlAndUser(url, user))
                 throw new SoundException(409, "이미 이 URL { " + url + " }에 매치되어있는 소리가 존재합니다.");
 
             urlRepository.save(Url.builder()
-                    .urlId(new UrlId(url, user.getId()))
+                    .url(url)
                     .user(user)
                     .build());
         }

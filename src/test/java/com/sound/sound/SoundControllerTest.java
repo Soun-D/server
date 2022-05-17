@@ -73,7 +73,7 @@ public class SoundControllerTest {
                 .build());
         urlRepository.save(Url.builder()
                 .user(user)
-                .urlId(new UrlId("https://test.com", user.getId()))
+                .url("https://test.com")
                 .build());
     }
 

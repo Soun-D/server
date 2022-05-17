@@ -8,4 +8,6 @@ import java.util.List;
 public interface SiteSoundRepository extends JpaRepository<SiteSound, Integer> {
 
     List<SiteSound> findAllByAudioFileUserEmailOrderById(String email);
+
+    boolean existsByAudioFileId(Integer audioFileId);
 }
