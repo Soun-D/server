@@ -1,6 +1,6 @@
 package com.sound.sound;
 
-import com.sound.sound.dto.request.EmailRequest;
+import com.sound.sound.dto.request.AudioFileRequest;
 import com.sound.sound.dto.request.IdReq;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.request.SiteSoundUpdateRequest;
@@ -23,8 +23,8 @@ public class SoundController {
     @PostMapping("/audio-file")
     @ResponseStatus(HttpStatus.CREATED)
     public void createAudioFile(@RequestPart(value = "mp3") MultipartFile audioFile,
-                                @Valid @RequestPart(value = "email") EmailRequest emailRequest) {
-        soundService.uploadAudioFile(audioFile, emailRequest);
+                                @Valid @RequestPart(value = "email") AudioFileRequest audioFileRequest) {
+        soundService.uploadAudioFile(audioFile, audioFileRequest);
     }
 
     @PostMapping("/site-sound")

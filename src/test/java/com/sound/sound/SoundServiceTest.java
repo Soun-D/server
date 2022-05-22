@@ -40,6 +40,8 @@ class SoundServiceTest {
 
     @AfterEach
     void tearDown() {
+        siteSoundRepository.deleteAll();
+        audioFileRepository.deleteAll();
         userRepository.deleteAll();
     }
 

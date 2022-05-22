@@ -1,6 +1,6 @@
 package com.sound.sound;
 
-import com.sound.sound.dto.request.EmailRequest;
+import com.sound.sound.dto.request.AudioFileRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
@@ -36,7 +36,7 @@ public class SoundService {
     private final UrlRepository urlRepository;
 
     @Transactional
-    public void uploadAudioFile(MultipartFile audioFile, EmailRequest request) {
+    public void uploadAudioFile(MultipartFile audioFile, AudioFileRequest request) {
 
         String email = request.getEmail();
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -60,6 +60,7 @@ public class SoundService {
                 .fileLocation(fileLocation)
                 .fileName(fileName)
                 .user(user)
+                .len(request.getLen())
                 .build());
     }
 

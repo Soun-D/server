@@ -66,6 +66,7 @@ public class SoundControllerTest {
                 .fileLocation("/index.mp3")
                 .user(user)
                 .fileName("index")
+                .len(1)
                 .build());
         siteSound = siteSoundRepository.save(SiteSound.builder()
                 .audioFile(audioFile)
@@ -79,6 +80,8 @@ public class SoundControllerTest {
 
     @AfterEach
     void tearDown() {
+        siteSoundRepository.deleteAll();
+        audioFileRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -192,14 +195,15 @@ public class SoundControllerTest {
     }
 
     @Test
-    void deleteAudioFile() throws Exception {
+    void deleteAudioFile_400() throws Exception {
         // given
         mvc.perform(delete("/audio-file")
-                .param("audioFileId", audioFile.getId().toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new IdReq(audioFile.getId())))
                 .param("email", user.getEmail()))
 
                 // then
-                .andExpect(status().isNoContent());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

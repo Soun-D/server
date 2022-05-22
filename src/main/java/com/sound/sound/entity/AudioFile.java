@@ -30,6 +30,9 @@ public class AudioFile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "len", nullable = false)
+    private Integer len;
+
     @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
 }
