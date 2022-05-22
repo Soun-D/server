@@ -52,6 +52,7 @@ class SoundServiceTest {
                 .fileLocation("fileLocation")
                 .fileName("fileName")
                 .user(user)
+                .len(1)
                 .build());
 
         SiteSoundRequest siteSoundRequest = new SiteSoundRequest(

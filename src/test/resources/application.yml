@@ -12,7 +12,7 @@ cloud:
     s3:
       bucket: kk
     region:
-      static: kk
+      static: ap-northeast-2
     stack:
       auto: false
     credentials:

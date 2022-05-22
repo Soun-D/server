@@ -97,7 +97,7 @@ public class SoundControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("email",
                 "",
                 "application/json",
-                "{\"email\": \"kwakdh25@gmail.com\"}".getBytes());
+                "{\"email\": \"kwakdh25@gmail.com\", \"len\": 1}".getBytes());
 
         given(fileUploadProvider.uploadFileToS3(any(MultipartFile.class))).willReturn("https://test.com");
 
