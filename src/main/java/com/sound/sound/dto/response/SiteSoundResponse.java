@@ -19,6 +19,8 @@ public class SiteSoundResponse {
 
     private final Integer fileId;
 
+    private final Integer len;
+
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
@@ -26,6 +28,7 @@ public class SiteSoundResponse {
                 .fileLocation(siteSound.getAudioFile().getFileLocation())
                 .fileName(siteSound.getAudioFile().getFileName())
                 .fileId(siteSound.getAudioFile().getId())
+                .len(siteSound.getAudioFile().getLen())
                 .build();
     }
 
@@ -33,6 +36,7 @@ public class SiteSoundResponse {
         return SiteSoundResponse.builder()
                 .url(url)
                 .fileLocation(siteSound.getAudioFile().getFileLocation())
+                .len(siteSound.getAudioFile().getLen())
                 .build();
     }
 }
