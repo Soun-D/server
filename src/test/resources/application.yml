@@ -10,12 +10,12 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: ${AWS_BUCKET}
+      bucket: kk
     region:
-      static: ${AWS_REGION}
+      static: kk
     stack:
       auto: false
     credentials:
       instanceProfile: true
-      accessKey: ${AWS_ACCESS}
-      secretKey: ${AWS_SECRET}
+      accessKey: kk
+      secretKey: kk
