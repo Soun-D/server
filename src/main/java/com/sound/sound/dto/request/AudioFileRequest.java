@@ -16,5 +16,5 @@ public class AudioFileRequest {
     private String email;
 
     @NotNull
-    private Integer len;
+    private Integer playTime;
 }

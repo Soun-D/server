@@ -6,7 +6,6 @@ import com.sound.sound.dto.request.SiteSoundUpdateRequest;
 import com.sound.sound.dto.request.YoutubeRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
-import com.sound.sound.dto.response.YoutubeResponse;
 import com.sound.sound.entity.*;
 import com.sound.sound.exception.SoundException;
 import com.sound.sound.mp3.FileUploadProvider;
@@ -44,11 +43,11 @@ public class SoundService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.orElseGet(() -> saveUser(email));
 
-        String fileName = requireNonNull(
+        String title = requireNonNull(
                 audioFile.getOriginalFilename()
         ).split("\\.")[0];
 
-        if (audioFileRepository.existsByFileNameAndUser(fileName, user))
+        if (audioFileRepository.existsByTitleAndUser(title, user))
             throw new SoundException(409, "동일한 이름의 파일이 이미 존재합니다.");
 
         String fileExtension = audioFile.getName();
@@ -56,13 +55,13 @@ public class SoundService {
         if (!fileExtension.equals("mp3") && !fileExtension.equals("m4a"))
             throw new SoundException(400, "{ " + fileExtension + " } 는 유효하지 않은 파일 형식입니다.");
 
-        String fileLocation = fileUploadProvider.uploadFileToS3(audioFile);
+        String src = fileUploadProvider.uploadFileToS3(audioFile);
 
         audioFileRepository.save(AudioFile.builder()
-                .fileLocation(fileLocation)
-                .fileName(fileName)
+                .src(src)
+                .title(title)
                 .user(user)
-                .len(request.getLen())
+                .playTime(request.getPlayTime())
                 .isYoutube(false)
                 .build());
     }
@@ -75,10 +74,10 @@ public class SoundService {
         User user = optionalUser.orElseGet(() -> saveUser(email));
 
         audioFileRepository.save(AudioFile.builder()
-                .len(request.getLen())
+                .playTime(request.getPlayTime())
                 .isYoutube(true)
-                .fileName(request.getTitle())
-                .fileLocation(request.getIframe())
+                .title(request.getTitle())
+                .src(request.getSrc())
                 .user(user)
                 .build());
     }
@@ -125,15 +124,21 @@ public class SoundService {
         siteSoundRepository.save(siteSound.update(request.getUrl(), audioFile));
     }
 
+    public List<AudioFileResponse> queryAllAudioFile(String email) {
+        return audioFileRepository.findAllByUserEmailOrderById(email).stream()
+                .map(AudioFileResponse::of)
+                .collect(Collectors.toList());
+    }
+
     public List<AudioFileResponse> queryAudioFile(String email) {
         return audioFileRepository.findAllByUserEmailAndIsYoutubeOrderById(email, false).stream()
                 .map(AudioFileResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public List<YoutubeResponse> queryYoutube(String email) {
+    public List<AudioFileResponse> queryYoutube(String email) {
         return audioFileRepository.findAllByUserEmailAndIsYoutubeOrderById(email, true).stream()
-                .map(YoutubeResponse::of)
+                .map(AudioFileResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -170,7 +175,7 @@ public class SoundService {
 
         audioFileRepository.deleteByIdAndUserEmail(audioFileId, email);
 
-        fileUploadProvider.deleteFile(audioFile.getFileLocation());
+        fileUploadProvider.deleteFile(audioFile.getSrc());
     }
 
     @Transactional

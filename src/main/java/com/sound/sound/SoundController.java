@@ -3,7 +3,6 @@ package com.sound.sound;
 import com.sound.sound.dto.request.*;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
-import com.sound.sound.dto.response.YoutubeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static com.sound.sound.dto.response.AudioFileResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +44,12 @@ public class SoundController {
         soundService.updateSiteSound(soundRequest);
     }
 
+    @GetMapping("/audio-file/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AudioFileResponse> readAllAudioFile(@RequestParam(value = "email") String email) {
+        return soundService.queryAllAudioFile(email);
+    }
+
     @GetMapping("/audio-file")
     @ResponseStatus(HttpStatus.OK)
     public List<AudioFileResponse> readAudioFile(@RequestParam(value = "email") String email) {
@@ -51,7 +58,7 @@ public class SoundController {
 
     @GetMapping("/youtube")
     @ResponseStatus(HttpStatus.OK)
-    public List<YoutubeResponse> readYoutube(@RequestParam(value = "email") String email) {
+    public List<AudioFileResponse> readYoutube(@RequestParam(value = "email") String email) {
         return soundService.queryYoutube(email);
     }
 

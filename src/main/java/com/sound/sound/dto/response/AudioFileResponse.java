@@ -5,25 +5,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+
 @Getter
 @AllArgsConstructor
 @Builder
 public class AudioFileResponse {
-
     private final Integer id;
 
-    private final String fileLocation;
+    private final String src;
 
-    private final String fileName;
+    private final String title;
 
-    private final Integer len;
+    private final Integer playTime;
+
+    private final Boolean isYoutube;
 
     public static AudioFileResponse of(AudioFile audioFile) {
         return AudioFileResponse.builder()
                 .id(audioFile.getId())
-                .fileLocation(audioFile.getFileLocation())
-                .fileName(audioFile.getFileName())
-                .len(audioFile.getLen())
+                .src(audioFile.getSrc())
+                .title(audioFile.getTitle())
+                .playTime(audioFile.getPlayTime())
+                .isYoutube(audioFile.getIsYoutube())
                 .build();
     }
 }
+

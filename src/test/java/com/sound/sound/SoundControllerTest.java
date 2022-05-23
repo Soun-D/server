@@ -63,10 +63,11 @@ public class SoundControllerTest {
     void setUp() {
         user = userRepository.save(new User("test@gmail.com"));
         audioFile = audioFileRepository.save(AudioFile.builder()
-                .fileLocation("/index.mp3")
+                .src("/index.mp3")
                 .user(user)
-                .fileName("index")
-                .len(1)
+                .title("index")
+                .isYoutube(false)
+                .playTime(1)
                 .build());
         siteSound = siteSoundRepository.save(SiteSound.builder()
                 .audioFile(audioFile)
@@ -97,7 +98,7 @@ public class SoundControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("email",
                 "",
                 "application/json",
-                "{\"email\": \"kwakdh25@gmail.com\", \"len\": 1}".getBytes());
+                "{\"email\": \"kwakdh25@gmail.com\", \"play_time\": 1}".getBytes());
 
         given(fileUploadProvider.uploadFileToS3(any(MultipartFile.class))).willReturn("https://test.com");
 
@@ -113,7 +114,7 @@ public class SoundControllerTest {
         List<AudioFile> audioFileList = audioFileRepository.findAllByUserEmailOrderById("kwakdh25@gmail.com");
 
         audioFileList.forEach(audioFile1 ->
-                assertEquals("https://test.com", audioFile1.getFileLocation())
+                assertEquals("https://test.com", audioFile1.getSrc())
         );
     }
 
@@ -180,7 +181,7 @@ public class SoundControllerTest {
 
                 // then
                 .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].file_location").value("/index.mp3"));
+        .andExpect(jsonPath("$[0].src").value("/index.mp3"));
     }
 
     @Test

@@ -20,18 +20,18 @@ public class AudioFile {
 
     @NotNull
     @Column(unique = true, nullable = false)
-    private String fileLocation;
+    private String src;
 
     @NotNull
     @Column(unique = true, nullable = false)
-    private String fileName;
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "len", nullable = false)
-    private Integer len;
+    @Column(name = "play_time", nullable = false)
+    private Integer playTime;
 
     @Column(name = "is_youtube", nullable = false, columnDefinition = "tinyint(1) default 0")
     private Boolean isYoutube;

@@ -13,30 +13,30 @@ public class SiteSoundResponse {
 
     private final String url;
 
-    private final String fileLocation;
+    private final String src;
 
-    private final String fileName;
+    private final String title;
 
     private final Integer fileId;
 
-    private final Integer len;
+    private final Integer playTime;
 
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
                 .url(siteSound.getUrl())
-                .fileLocation(siteSound.getAudioFile().getFileLocation())
-                .fileName(siteSound.getAudioFile().getFileName())
+                .src(siteSound.getAudioFile().getSrc())
+                .title(siteSound.getAudioFile().getTitle())
                 .fileId(siteSound.getAudioFile().getId())
-                .len(siteSound.getAudioFile().getLen())
+                .playTime(siteSound.getAudioFile().getPlayTime())
                 .build();
     }
 
     public static SiteSoundResponse oneUrl(String url, SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .url(url)
-                .fileLocation(siteSound.getAudioFile().getFileLocation())
-                .len(siteSound.getAudioFile().getLen())
+                .src(siteSound.getAudioFile().getSrc())
+                .playTime(siteSound.getAudioFile().getPlayTime())
                 .build();
     }
 }

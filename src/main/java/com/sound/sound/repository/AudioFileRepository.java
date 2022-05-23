@@ -11,5 +11,7 @@ public interface AudioFileRepository extends CrudRepository<AudioFile, Integer> 
 
     void deleteByIdAndUserEmail(Integer id, String email);
 
-    boolean existsByFileNameAndUser(String fileName, User user);
+    boolean existsByTitleAndUser(String title, User user);
+
+    List<AudioFile> findAllByUserEmailOrderById(String email);
 }

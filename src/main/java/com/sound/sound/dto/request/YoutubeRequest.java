@@ -14,11 +14,11 @@ public class YoutubeRequest {
     private String email;
 
     @NotBlank
-    private String iframe;
+    private String src;
 
     @NotBlank
     private String title;
 
     @NotNull
-    private Integer len;
+    private Integer playTime;
 }

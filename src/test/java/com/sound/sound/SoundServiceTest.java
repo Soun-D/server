@@ -49,10 +49,11 @@ class SoundServiceTest {
     void saveSiteSound_2urls() {
         //given
         AudioFile audioFile = audioFileRepository.save(AudioFile.builder()
-                .fileLocation("fileLocation")
-                .fileName("fileName")
+                .src("fileLocation")
+                .title("fileName")
                 .user(user)
-                .len(1)
+                .isYoutube(false)
+                .playTime(1)
                 .build());
 
         SiteSoundRequest siteSoundRequest = new SiteSoundRequest(
