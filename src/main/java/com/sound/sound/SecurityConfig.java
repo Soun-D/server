@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         http.csrf().disable()
                 .cors().disable()
             .authorizeRequests()
-                .antMatchers("/audio-file", "/site-sound","/site-sound/*").permitAll()
+                .antMatchers("/audio-file", "/site-sound", "/site-sound/*", "/audio-file/*", "/youtube").permitAll()
             .anyRequest().authenticated();
     }
 
