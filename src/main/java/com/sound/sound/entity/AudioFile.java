@@ -33,6 +33,9 @@ public class AudioFile {
     @Column(name = "len", nullable = false)
     private Integer len;
 
+    @Column(name = "is_youtube", nullable = false, columnDefinition = "tinyint(1) default 0")
+    private Boolean isYoutube;
+
     @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
 }

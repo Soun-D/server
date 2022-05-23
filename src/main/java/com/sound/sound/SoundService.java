@@ -3,8 +3,10 @@ package com.sound.sound;
 import com.sound.sound.dto.request.AudioFileRequest;
 import com.sound.sound.dto.request.SiteSoundRequest;
 import com.sound.sound.dto.request.SiteSoundUpdateRequest;
+import com.sound.sound.dto.request.YoutubeRequest;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
+import com.sound.sound.dto.response.YoutubeResponse;
 import com.sound.sound.entity.*;
 import com.sound.sound.exception.SoundException;
 import com.sound.sound.mp3.FileUploadProvider;
@@ -61,6 +63,23 @@ public class SoundService {
                 .fileName(fileName)
                 .user(user)
                 .len(request.getLen())
+                .isYoutube(false)
+                .build());
+    }
+
+    @Transactional
+    public void saveYoutube(YoutubeRequest request) {
+
+        String email = request.getEmail();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = optionalUser.orElseGet(() -> saveUser(email));
+
+        audioFileRepository.save(AudioFile.builder()
+                .len(request.getLen())
+                .isYoutube(true)
+                .fileName(request.getTitle())
+                .fileLocation(request.getIframe())
+                .user(user)
                 .build());
     }
 
@@ -107,8 +126,14 @@ public class SoundService {
     }
 
     public List<AudioFileResponse> queryAudioFile(String email) {
-        return audioFileRepository.findAllByUserEmailOrderById(email).stream()
+        return audioFileRepository.findAllByUserEmailAndIsYoutubeOrderById(email, false).stream()
                 .map(AudioFileResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<YoutubeResponse> queryYoutube(String email) {
+        return audioFileRepository.findAllByUserEmailAndIsYoutubeOrderById(email, true).stream()
+                .map(YoutubeResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -123,15 +148,15 @@ public class SoundService {
         List<SiteSound> siteSoundList = siteSoundRepository.findAllByAudioFileUserEmailOrderById(email);
         siteSoundList
                 .forEach(
-                siteSound -> {
-                    String[] existsUrls = siteSound.getUrl()
-                            .replaceAll("\\s", "")
-                            .split(",");
+                        siteSound -> {
+                            String[] existsUrls = siteSound.getUrl()
+                                    .replaceAll("\\s", "")
+                                    .split(",");
 
-                    if (existsUrls.length > 0)
-                        for (String url : existsUrls)
-                            responseList.add(SiteSoundResponse.oneUrl(url, siteSound));
-                });
+                            if (existsUrls.length > 0)
+                                for (String url : existsUrls)
+                                    responseList.add(SiteSoundResponse.oneUrl(url, siteSound));
+                        });
 
         return responseList;
     }
@@ -181,7 +206,7 @@ public class SoundService {
     private void saveEachUrl(String[] urls, User user) {
         for (String url : urls) {
 
-            if (!Pattern.matches("^((http(s?))://)([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]{2,6}(:[0-9]+)?(/\\S*)?$", url) )
+            if (!Pattern.matches("^((http(s?))://)([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]{2,6}(:[0-9]+)?(/\\S*)?$", url))
                 throw new SoundException(400, "URL이 형식에 맞지 않습니다.");
 
             if (urlRepository.existsByUrlAndUser(url, user))

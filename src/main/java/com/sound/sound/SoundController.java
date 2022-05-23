@@ -1,11 +1,9 @@
 package com.sound.sound;
 
-import com.sound.sound.dto.request.AudioFileRequest;
-import com.sound.sound.dto.request.IdReq;
-import com.sound.sound.dto.request.SiteSoundRequest;
-import com.sound.sound.dto.request.SiteSoundUpdateRequest;
+import com.sound.sound.dto.request.*;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
+import com.sound.sound.dto.response.YoutubeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +31,12 @@ public class SoundController {
         soundService.saveSiteSound(soundRequest);
     }
 
+    @PostMapping("/youtube")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createYoutube(@Valid @RequestBody YoutubeRequest youtubeRequest) {
+        soundService.saveYoutube(youtubeRequest);
+    }
+
     @PutMapping("/site-sound")
     @ResponseStatus(HttpStatus.CREATED)
     public void updateSiteSound(@Valid @RequestBody SiteSoundUpdateRequest soundRequest) {
@@ -43,6 +47,12 @@ public class SoundController {
     @ResponseStatus(HttpStatus.OK)
     public List<AudioFileResponse> readAudioFile(@RequestParam(value = "email") String email) {
         return soundService.queryAudioFile(email);
+    }
+
+    @GetMapping("/youtube")
+    @ResponseStatus(HttpStatus.OK)
+    public List<YoutubeResponse> readYoutube(@RequestParam(value = "email") String email) {
+        return soundService.queryYoutube(email);
     }
 
     @GetMapping("/site-sound")
