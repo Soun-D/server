@@ -15,6 +15,8 @@ public class SiteSoundResponse {
 
     private final String src;
 
+    private final Boolean isYoutube;
+
     private final String title;
 
     private final Integer fileId;
@@ -29,6 +31,7 @@ public class SiteSoundResponse {
                 .title(siteSound.getAudioFile().getTitle())
                 .fileId(siteSound.getAudioFile().getId())
                 .playTime(siteSound.getAudioFile().getPlayTime())
+                .isYoutube(siteSound.getAudioFile().getIsYoutube())
                 .build();
     }
 
@@ -37,6 +40,7 @@ public class SiteSoundResponse {
                 .url(url)
                 .src(siteSound.getAudioFile().getSrc())
                 .playTime(siteSound.getAudioFile().getPlayTime())
+                .isYoutube(siteSound.getAudioFile().getIsYoutube())
                 .build();
     }
 }
