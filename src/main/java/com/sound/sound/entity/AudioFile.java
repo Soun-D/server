@@ -36,6 +36,9 @@ public class AudioFile {
     @Column(name = "is_youtube", nullable = false, columnDefinition = "tinyint(1) default 0")
     private Boolean isYoutube;
 
+    @Column(name = "visible", nullable = false, columnDefinition = "tinyint(1) default 0")
+    private Boolean visible;
+
     @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
 }

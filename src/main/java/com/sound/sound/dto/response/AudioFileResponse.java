@@ -20,6 +20,8 @@ public class AudioFileResponse {
 
     private final Boolean isYoutube;
 
+    private final Boolean visible;
+
     public static AudioFileResponse of(AudioFile audioFile) {
         return AudioFileResponse.builder()
                 .id(audioFile.getId())
@@ -27,6 +29,7 @@ public class AudioFileResponse {
                 .title(audioFile.getTitle())
                 .playTime(audioFile.getPlayTime())
                 .isYoutube(audioFile.getIsYoutube())
+                .visible(audioFile.getVisible())
                 .build();
     }
 }

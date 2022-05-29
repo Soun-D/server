@@ -21,4 +21,7 @@ public class YoutubeRequest {
 
     @NotNull
     private Integer playTime;
+
+    @NotNull
+    private Boolean visible;
 }

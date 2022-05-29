@@ -68,6 +68,7 @@ public class SoundControllerTest {
                 .title("index")
                 .isYoutube(false)
                 .playTime(1)
+                .visible(false)
                 .build());
         siteSound = siteSoundRepository.save(SiteSound.builder()
                 .audioFile(audioFile)

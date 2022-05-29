@@ -63,6 +63,7 @@ public class SoundService {
                 .user(user)
                 .playTime(request.getPlayTime())
                 .isYoutube(false)
+                .visible(false)
                 .build());
     }
 
@@ -77,6 +78,7 @@ public class SoundService {
                 .playTime(request.getPlayTime())
                 .isYoutube(true)
                 .title(request.getTitle())
+                .visible(request.getVisible())
                 .src(request.getSrc())
                 .user(user)
                 .build());

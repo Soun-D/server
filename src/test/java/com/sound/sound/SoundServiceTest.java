@@ -53,6 +53,7 @@ class SoundServiceTest {
                 .title("fileName")
                 .user(user)
                 .isYoutube(false)
+                .visible(false)
                 .playTime(1)
                 .build());
 
