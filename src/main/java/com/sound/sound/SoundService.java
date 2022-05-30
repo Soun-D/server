@@ -1,9 +1,6 @@
 package com.sound.sound;
 
-import com.sound.sound.dto.request.AudioFileRequest;
-import com.sound.sound.dto.request.SiteSoundRequest;
-import com.sound.sound.dto.request.SiteSoundUpdateRequest;
-import com.sound.sound.dto.request.YoutubeRequest;
+import com.sound.sound.dto.request.*;
 import com.sound.sound.dto.response.AudioFileResponse;
 import com.sound.sound.dto.response.SiteSoundResponse;
 import com.sound.sound.entity.*;
@@ -192,6 +189,12 @@ public class SoundService {
             urlRepository.deleteByUrlAndUser(url, siteSound.getAudioFile().getUser());
 
         siteSoundRepository.deleteById(siteSoundId);
+    }
+
+    @Transactional
+    public void updateYoutube(YoutubeUpdateRequest request) {
+        AudioFile audioFile = getAudioFileById(request.getId());
+        audioFileRepository.save(audioFile.update(request));
     }
 
 

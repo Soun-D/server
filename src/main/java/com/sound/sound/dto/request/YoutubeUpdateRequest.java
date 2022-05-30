@@ -5,25 +5,20 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
-public class YoutubeRequest {
+public class YoutubeUpdateRequest {
 
-    @NotBlank
-    private String email;
-
-    @NotBlank
-    private String src;
+    @NotNull
+    private Integer id;
 
     @NotBlank
     private String title;
 
     @NotNull
-    @Size(min = 1, max = 300)
-    private Integer playTime;
+    private Boolean visible;
 
     @NotNull
-    private Boolean visible;
+    private Integer playTime;
 }

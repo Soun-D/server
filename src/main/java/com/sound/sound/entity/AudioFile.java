@@ -1,5 +1,6 @@
 package com.sound.sound.entity;
 
+import com.sound.sound.dto.request.YoutubeUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,4 +42,11 @@ public class AudioFile {
 
     @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
+
+    public AudioFile update(YoutubeUpdateRequest request) {
+        this.title = request.getTitle();
+        this.playTime = request.getPlayTime();
+        this.visible = request.getVisible();
+        return this;
+    }
 }

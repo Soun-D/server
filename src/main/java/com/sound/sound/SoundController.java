@@ -11,13 +11,42 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.List;
 
-import static com.sound.sound.dto.response.AudioFileResponse.*;
-
 @RestController
 @RequiredArgsConstructor
 public class SoundController {
 
     private final SoundService soundService;
+
+    @PostMapping("/site-sound")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createSiteSound(@Valid @RequestBody SiteSoundRequest soundRequest) {
+        soundService.saveSiteSound(soundRequest);
+    }
+
+    @GetMapping("/site-sound")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SiteSoundResponse> readSiteSound(@RequestParam(value = "email") String email) {
+        return soundService.querySiteSound(email);
+    }
+
+    @GetMapping("/site-sound/split")
+    @ResponseStatus(HttpStatus.OK)
+    public List<SiteSoundResponse> readSplitSiteSound(@RequestParam(value = "email") String email) {
+        return soundService.querySplitSiteSound(email);
+    }
+
+    @PutMapping("/site-sound")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void updateSiteSound(@Valid @RequestBody SiteSoundUpdateRequest soundRequest) {
+        soundService.updateSiteSound(soundRequest);
+    }
+
+    @DeleteMapping("/site-sound")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSiteSound(@RequestBody IdReq siteSoundId) {
+        soundService.deleteSiteSound(siteSoundId.getId());
+    }
+
 
     @PostMapping("/audio-file")
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,22 +55,10 @@ public class SoundController {
         soundService.uploadAudioFile(audioFile, audioFileRequest);
     }
 
-    @PostMapping("/site-sound")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createSiteSound(@Valid @RequestBody SiteSoundRequest soundRequest) {
-        soundService.saveSiteSound(soundRequest);
-    }
-
     @PostMapping("/youtube")
     @ResponseStatus(HttpStatus.CREATED)
     public void createYoutube(@Valid @RequestBody YoutubeRequest youtubeRequest) {
         soundService.saveYoutube(youtubeRequest);
-    }
-
-    @PutMapping("/site-sound")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void updateSiteSound(@Valid @RequestBody SiteSoundUpdateRequest soundRequest) {
-        soundService.updateSiteSound(soundRequest);
     }
 
     @GetMapping("/audio-file/all")
@@ -62,16 +79,10 @@ public class SoundController {
         return soundService.queryYoutube(email);
     }
 
-    @GetMapping("/site-sound")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SiteSoundResponse> readSiteSound(@RequestParam(value = "email") String email) {
-        return soundService.querySiteSound(email);
-    }
-
-    @GetMapping("/site-sound/split")
-    @ResponseStatus(HttpStatus.OK)
-    public List<SiteSoundResponse> readSplitSiteSound(@RequestParam(value = "email") String email) {
-        return soundService.querySplitSiteSound(email);
+    @PutMapping("/youtube")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void updateYoutube(@RequestBody YoutubeUpdateRequest request) {
+        soundService.updateYoutube(request);
     }
 
     @DeleteMapping("/audio-file")
@@ -81,9 +92,5 @@ public class SoundController {
         soundService.deleteAudioFile(audioFileId.getId(), email);
     }
 
-    @DeleteMapping("/site-sound")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSiteSound(@RequestBody IdReq siteSoundId) {
-        soundService.deleteSiteSound(siteSoundId.getId());
-    }
+
 }
