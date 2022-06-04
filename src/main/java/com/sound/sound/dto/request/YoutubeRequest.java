@@ -3,9 +3,7 @@ package com.sound.sound.dto.request;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @NoArgsConstructor
@@ -21,7 +19,8 @@ public class YoutubeRequest {
     private String title;
 
     @NotNull
-    @Size(min = 1, max = 300)
+    @Min(value = 1)
+    @Max(value = 300)
     private Integer playTime;
 
     @NotNull
