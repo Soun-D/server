@@ -25,6 +25,8 @@ public class SiteSoundResponse {
 
     private final Boolean visible;
 
+    private final String start;
+
     public static SiteSoundResponse of(SiteSound siteSound) {
         return SiteSoundResponse.builder()
                 .id(siteSound.getId())
@@ -35,6 +37,7 @@ public class SiteSoundResponse {
                 .playTime(siteSound.getAudioFile().getPlayTime())
                 .isYoutube(siteSound.getAudioFile().getIsYoutube())
                 .visible(siteSound.getAudioFile().getVisible())
+                .start(siteSound.getAudioFile().getStart())
                 .build();
     }
 
@@ -45,6 +48,7 @@ public class SiteSoundResponse {
                 .playTime(siteSound.getAudioFile().getPlayTime())
                 .isYoutube(siteSound.getAudioFile().getIsYoutube())
                 .visible(siteSound.getAudioFile().getVisible())
+                .start(siteSound.getAudioFile().getStart())
                 .build();
     }
 }
