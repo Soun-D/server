@@ -78,6 +78,7 @@ public class SoundService {
                 .visible(request.getVisible())
                 .src(request.getSrc())
                 .user(user)
+                .start(request.getStart())
                 .build());
     }
 

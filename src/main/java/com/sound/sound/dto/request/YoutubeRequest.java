@@ -25,4 +25,6 @@ public class YoutubeRequest {
 
     @NotNull
     private Boolean visible;
+
+    private String start;
 }

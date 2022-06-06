@@ -40,6 +40,9 @@ public class AudioFile {
     @Column(name = "visible", nullable = false, columnDefinition = "tinyint(1) default 0")
     private Boolean visible;
 
+    @Column(name = "start")
+    private String start;
+
     @OneToMany(mappedBy = "audioFile")
     private List<SiteSound> siteSound;
 

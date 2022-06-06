@@ -22,6 +22,8 @@ public class AudioFileResponse {
 
     private final Boolean visible;
 
+    private final String start;
+
     public static AudioFileResponse of(AudioFile audioFile) {
         return AudioFileResponse.builder()
                 .id(audioFile.getId())
@@ -30,6 +32,7 @@ public class AudioFileResponse {
                 .playTime(audioFile.getPlayTime())
                 .isYoutube(audioFile.getIsYoutube())
                 .visible(audioFile.getVisible())
+                .start(audioFile.getStart())
                 .build();
     }
 }
